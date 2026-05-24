@@ -31,3 +31,5 @@ yarn-error.log*
 
 # Future Firebase service account
 firebase-service-account.json
+*-firebase-adminsdk-*.json
+club-fire-11-firebase-adminsdk-*.json

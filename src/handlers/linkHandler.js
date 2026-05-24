@@ -77,6 +77,17 @@ export async function handleLink(ctx, url) {
 
   } catch (err) {
     logger.error('handleLink error', err);
-    await ctx.telegram.editMessageText(ctx.chat.id, processingMsg.message_id, null, MESSAGES.ERROR).catch(() => {});
+
+    let userMessage = MESSAGES.ERROR;
+
+    if (err.message === 'VIDEO_UNAVAILABLE') {
+      userMessage = '❌ This video is unavailable, private, or deleted.';
+    } else if (err.message === 'TIMEOUT') {
+      userMessage = '⏳ Taking too long to fetch info. Please try again.';
+    } else if (err.message === 'YT_DLP_NOT_FOUND') {
+      userMessage = '⚠️ yt-dlp is not installed or not in PATH. Please install it.';
+    }
+
+    await ctx.telegram.editMessageText(ctx.chat.id, processingMsg.message_id, null, userMessage).catch(() => {});
   }
 }

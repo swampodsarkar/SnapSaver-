@@ -36,8 +36,21 @@ export async function getVideoInfo(url, platform) {
       url,
     };
   } catch (err) {
-    logger.error('yt-dlp getVideoInfo failed', err.message || err);
-    throw err;
+    const errorMsg = err.stderr || err.message || err;
+    logger.error('yt-dlp getVideoInfo failed', errorMsg);
+
+    // Provide better error for common cases
+    if (err.exitCode === 1 || errorMsg.includes('ERROR:')) {
+      throw new Error('VIDEO_UNAVAILABLE');
+    }
+    if (err.timedOut) {
+      throw new Error('TIMEOUT');
+    }
+    if (errorMsg.includes('command not found') || errorMsg.includes('not recognized')) {
+      throw new Error('YT_DLP_NOT_FOUND');
+    }
+
+    throw new Error('UNKNOWN_ERROR');
   }
 }
 
